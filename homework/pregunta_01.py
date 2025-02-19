@@ -38,54 +38,56 @@ def pregunta_01():
     * Su código debe crear la carpeta `docs` si no existe.
 
     """
-    data_file = pd.read_csv('files/input/shipping-data.csv')
-    data_copy_A = data_file.copy()
-    warehouse_distribution = data_copy_A['Warehouse_block'].value_counts()
-    warehouse_distribution.plot.bar(
-        title="Shipments per Warehouse",
-        xlabel="Warehouse Block",
-        ylabel="Number of Shipments",
+    datos_envio = pd.read_csv("files/input/shipping-data.csv")
+    almacen_datos = datos_envio.copy()
+    plt.figure()
+    conteos_almacen = almacen_datos["Warehouse_block"].value_counts()
+    conteos_almacen.plot.bar(
+        title="Shipping per Warehouse",
+        xlabel="Warehouse block",
+        ylabel="Record count",
         color="tab:blue",
         fontsize=8
     )
     plt.gca().spines["top"].set_visible(False)
     plt.gca().spines["right"].set_visible(False)
-    plt.savefig('output/shipments_per_warehouse.png')
-    data_copy_B = data_file.copy()
+    plt.savefig("docs/shipping_per_warehouse.png")
+
+    modo_envio = datos_envio.copy()
     plt.figure()
-    shipment_distribution = data_copy_B['Mode_of_Shipment'].value_counts()
-    shipment_distribution.plot.pie(
-        title="Shipment Modes",
+    conteos_modo = modo_envio["Mode_of_Shipment"].value_counts()
+    conteos_modo.plot.pie(
+        title="Mode of shipment",
         wedgeprops=dict(width=0.35),
         ylabel="",
         colors=["tab:blue", "tab:orange", "tab:green"],
     )
-    plt.savefig('output/shipment_modes.png')
-    data_copy_C = data_file.copy()
+    plt.savefig("docs/mode_of_shipment.png")
+
+    valoracion_clientes = datos_envio.copy()
     plt.figure()
-    rating_summary = (
-        data_copy_C[["Mode_of_Shipment", "Customer_rating"]]
-        .groupby("Mode_of_Shipment")
-        .describe()
-    )
-    rating_summary.columns = rating_summary.columns.droplevel()
-    rating_summary = rating_summary[["mean", "min", "max"]]
+    valoracion_clientes = (valoracion_clientes[["Mode_of_Shipment", "Customer_rating"]].groupby("Mode_of_Shipment").describe())
+    valoracion_clientes.columns = valoracion_clientes.columns.droplevel()
+    valoracion_clientes = valoracion_clientes[["mean", "min", "max"]] 
     plt.barh(
-        y=rating_summary.index.values,
-        width=rating_summary["max"].values - 1,
-        left=rating_summary["min"].values,
+        y=valoracion_clientes.index.values,
+        width=valoracion_clientes["max"].values - 1,
+        left=valoracion_clientes["min"].values,
         height=0.9,
         color="lightgray",
         alpha=0.8,
-    )
+    )   
 
-    color_scheme = ["tab:green" if val >= 3.0 else "tab:orange" for val in rating_summary["mean"].values]
+    colores_barras = [
+        "tab:green" if valor >= 3.0 else "tab:orange" for valor in valoracion_clientes["mean"].values
+    ]
+
     plt.barh(
-        y=rating_summary.index.values,
-        width=rating_summary["mean"].values - 1,
-        left=rating_summary["min"].values,
-        color=color_scheme,
+        y=valoracion_clientes.index.values,
+        width=valoracion_clientes["mean"].values - 1,
+        left=valoracion_clientes["min"].values,
         height=0.5,
+        color=colores_barras,
         alpha=1.0,
     )
     plt.title("Average Customer Rating")
@@ -93,33 +95,15 @@ def pregunta_01():
     plt.gca().spines["right"].set_visible(False)
     plt.gca().spines["left"].set_visible(False)
     plt.gca().spines["bottom"].set_visible(False)
-    plt.savefig("output/average_customer_rating.png")
-    data_copy_D = data_file.copy()
+    plt.savefig("docs/average_customer_rating.png")
+
+    peso_envios = datos_envio.copy()
     plt.figure()
-    data_copy_D.Weight_in_gms.plot.hist(
-        title="Distribution of Shipped Weights",
+    peso_envios.Weight_in_gms.plot.hist(
+        title="Shipping weight distribution",
         color="tab:orange",
         edgecolor="white",
     )
     plt.gca().spines["top"].set_visible(False)
     plt.gca().spines["right"].set_visible(False)
-    plt.savefig("output/weight_distribution.png")
-    dashboard_html = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <body>
-        <h1>Shipping Dashboard</h1>
-        <div style="width: 45%; float: left">
-            <img src="shipments_per_warehouse.png" alt="Warehouse Shipments" />
-            <img src="shipment_modes.png" alt="Shipment Modes" />
-        </div>
-        <div style="width: 45%; float: left">
-            <img src="average_customer_rating.png" alt="Customer Ratings" />
-            <img src="weight_distribution.png" alt="Weight Distribution" />
-        </div>
-    </body>
-    </html>
-    """
-    html_path = "output/index.html"
-    with open(html_path, "w") as file:
-        file.write(dashboard_html)
+    plt.savefig("docs/weight_distribution.png")
