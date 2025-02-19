@@ -38,13 +38,10 @@ def pregunta_01():
     * Su código debe crear la carpeta `docs` si no existe.
 
     """
-    
-    os.makedirs('output', exist_ok=True)
-
-    data = pd.read_csv('files/input/shipping-data.csv')
-    data_copy1 = data.copy()
-    warehouse_counts = data_copy1['Warehouse_block'].value_counts()
-    warehouse_counts.plot.bar(
+    data_file = pd.read_csv('files/input/shipping-data.csv')
+    data_copy_A = data_file.copy()
+    warehouse_distribution = data_copy_A['Warehouse_block'].value_counts()
+    warehouse_distribution.plot.bar(
         title="Shipments per Warehouse",
         xlabel="Warehouse Block",
         ylabel="Number of Shipments",
@@ -54,20 +51,20 @@ def pregunta_01():
     plt.gca().spines["top"].set_visible(False)
     plt.gca().spines["right"].set_visible(False)
     plt.savefig('output/shipments_per_warehouse.png')
-    data_copy2 = data.copy()
+    data_copy_B = data_file.copy()
     plt.figure()
-    shipment_counts = data_copy2['Mode_of_Shipment'].value_counts()
-    shipment_counts.plot.pie(
+    shipment_distribution = data_copy_B['Mode_of_Shipment'].value_counts()
+    shipment_distribution.plot.pie(
         title="Shipment Modes",
         wedgeprops=dict(width=0.35),
         ylabel="",
         colors=["tab:blue", "tab:orange", "tab:green"],
     )
     plt.savefig('output/shipment_modes.png')
-    data_copy3 = data.copy()
+    data_copy_C = data_file.copy()
     plt.figure()
     rating_summary = (
-        data_copy3[["Mode_of_Shipment", "Customer_rating"]]
+        data_copy_C[["Mode_of_Shipment", "Customer_rating"]]
         .groupby("Mode_of_Shipment")
         .describe()
     )
@@ -82,24 +79,24 @@ def pregunta_01():
         alpha=0.8,
     )
 
-    colors = ["tab:green" if val >= 3.0 else "tab:orange" for val in rating_summary["mean"].values]
+    color_scheme = ["tab:green" if val >= 3.0 else "tab:orange" for val in rating_summary["mean"].values]
     plt.barh(
         y=rating_summary.index.values,
         width=rating_summary["mean"].values - 1,
         left=rating_summary["min"].values,
-        color=colors,
+        color=color_scheme,
         height=0.5,
         alpha=1.0,
     )
     plt.title("Average Customer Rating")
-    plt.gca().spines["left"].set_color("gray")
-    plt.gca().spines["bottom"].set_color("gray")
     plt.gca().spines["top"].set_visible(False)
     plt.gca().spines["right"].set_visible(False)
+    plt.gca().spines["left"].set_visible(False)
+    plt.gca().spines["bottom"].set_visible(False)
     plt.savefig("output/average_customer_rating.png")
-    data_copy4 = data.copy()
+    data_copy_D = data_file.copy()
     plt.figure()
-    data_copy4.Weight_in_gms.plot.hist(
+    data_copy_D.Weight_in_gms.plot.hist(
         title="Distribution of Shipped Weights",
         color="tab:orange",
         edgecolor="white",
